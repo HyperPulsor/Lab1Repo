@@ -14,10 +14,14 @@ from wishlist.models import BarangWishlist
 @login_required(login_url='/wishlist/login/')
 def show_wishlist(request):
     data_barang_wishlist = BarangWishlist.objects.all()
+    var = request.COOKIES.get('last_login', 'UserNotFound')
+    if var == "UserNotFound":
+        response = HttpResponseRedirect(reverse("wishlist:login"))
+        return response
     context = {
         'list_barang': data_barang_wishlist,
         'nama': 'Rakan Fasya Athhar Rayyan',
-        'last_login': request.COOKIES['last_login'],
+        'last_login': var,
     }
     return render(request, "wishlist.html", context)
 
