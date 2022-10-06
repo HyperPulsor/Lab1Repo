@@ -1,0 +1,154 @@
+{% extends 'base.html' %} {% block content %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT"
+      crossorigin="anonymous"
+    />
+  </head>
+  <body>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script text="text/javascript">
+      $.ajax({
+        url: "../json/",
+        dataType: "json",
+        success: function (data) {
+          for (var i = 0; i < data.length; i++) {
+            var row = $(
+              "<tr><td>" +
+                data[i].fields.nama_barang +
+                "</td><td>" +
+                data[i].fields.harga_barang +
+                "</td><td>" +
+                data[i].fields.deskripsi +
+                "</td></tr>"
+            );
+            $("#tabel_wishlist").append(row);
+          }
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+          alert("Error: " + textStatus + " - " + errorThrown);
+        },
+      });
+      $(document).ready(function () {
+        $("add_wishlist").click(function () {
+          var nama_barang = $("#nama_barang").val();
+          var harga_barang = $("#harga_barang").val();
+          var deskripsi_barang = $("#deskripsi_barang").val();
+          var csrfmiddlewaretoken = $("input[name=csrfmiddlewaretoken]").val();
+
+          $.post(
+            "http://localhost:8000/wishlist/ajax/submit/",
+            {
+              nama_barang,
+              harga_barang,
+              deskripsi_barang,
+              csrfmiddlewaretoken,
+            },
+            function (data, status) {
+              document.getElementById("add_wishlist").reset();
+              var row = $(
+                "<tr><td>" +
+                  nama_barang +
+                  "</td><td>" +
+                  harga_barang +
+                  "</td><td>" +
+                  deskripsi_barang +
+                  "</td></tr>"
+              );
+              $("#tabel_wishlist").append(row);
+            }
+          );
+        });
+      });
+    </script>
+
+    <nav class="navbar navbar-expand-lg-dark" style="background-color: #e3f2fd">
+      <div class="container-fluid">
+        <a
+          class="navbar-brand"
+          href="#"
+          style="color: black; text-decoration: none"
+          >Halo, {{nama}}!</a
+        >
+        <button type="button" class="btn btn-dark">
+          <a
+            href="{% url 'wishlist:logout' %}"
+            style="text-decoration: none; color: white"
+            >Logout</a
+          >
+        </button>
+      </div>
+    </nav>
+
+    <h3 style="text-align: center">Tabel Wishlist</h3>
+    <table class="table" id="tabel_wishlist">
+      <tr>
+        <thead class="table-dark">
+          <th style="text-align: center">Nama Barang</th>
+          <th style="text-align: center">Harga Barang</th>
+          <th style="text-align: center">Deskripsi</th>
+        </thead>
+      </tr>
+    </table>
+
+    <form action="POST" action="">
+      {% csrf_token %}
+      <table class="table">
+        <tr>
+          <td style="text-align: center">Nama Barang</td>
+          <td>
+            <input
+              type="text"
+              name="nama_barang"
+              placeholder="Nama Barang"
+              class="form-control"
+              id="nama_barang"
+            />
+          </td>
+        </tr>
+        <tr>
+          <td style="text-align: center">Harga Barang</td>
+          <td>
+            <input
+              type="text"
+              name="harga_barang"
+              placeholder="Harga Barang"
+              class="form-control"
+              id="harga_barang"
+            />
+          </td>
+        </tr>
+        <tr>
+          <td style="text-align: center">Deskripsi</td>
+          <td>
+            <input
+              type="text"
+              name="deskripsi_barang"
+              placeholder="Deskripsi Barang"
+              class="form-control"
+              id="deskripsi_barang"
+            />
+          </td>
+        </tr>
+        <tr>
+          <td><input class="btn btn-dark" type="submit" /></td>
+        </tr>
+      </table>
+    </form>
+
+    <h5 style="font-size: small; text-align: center">
+      Sesi terakhir login: {{ last_login }}
+    </h5>
+
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-u1OknCvxWvY5kfmNBILK2hRnQC3Pr17a+RTT6rIHI7NnikvbZlHgTPOOmMi466C8"
+      crossorigin="anonymous"
+    ></script>
+  </body>
+</html>
+{% endblock content %}

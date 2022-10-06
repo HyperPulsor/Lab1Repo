@@ -1,4 +1,6 @@
 import datetime
+from email.policy import HTTP
+from operator import methodcaller
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core import serializers
@@ -8,6 +10,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
+from requests import request
 from wishlist.models import BarangWishlist
 
 # Create your views here.
@@ -24,6 +27,30 @@ def show_wishlist(request):
         'last_login': var,
     }
     return render(request, "wishlist.html", context)
+
+def add_wishlist(request) :
+    if request.method == "POST":
+        print("test")
+        nama_barang = request.POST.get("nama_barang")
+        harga_barang = request.POST.get("harga_barang")
+        deskripsi_barang = request.POST.get("deskripsi_barang")
+        BarangWishlist.objects.create(nama_barang=nama_barang, harga_barang=harga_barang, deskripsi_barang=deskripsi_barang)
+        return HttpResponse()
+    else :
+        response = redirect("wishlist:show_wishlist")
+        return response
+
+@login_required(login_url='/wishlist/login/')
+def show_ajax_wishlist(request):
+    var = request.COOKIES.get('last_login', 'UserNotFound')
+    if var == "UserNotFound":
+        response = HttpResponseRedirect(reverse("wishlist:login"))
+        return response
+    context = {
+        'nama': 'Rakan Fasya Athhar Rayyan',
+        'last_login': var,
+    }
+    return render(request, "wishlist_ajax.html", context)
 
 def return_XML(request):
     data = BarangWishlist.objects.all()
